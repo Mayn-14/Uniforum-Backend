@@ -1,7 +1,9 @@
 from django.db import models
+from customUser.models import Account
 
-# Create your models here.
 class Chat(models.Model):
+    sender = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="senders", null=True)
+    receiver = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="receivers", null=True)
     content = models.CharField(max_length=1000)
     timestamp = models.DateTimeField(auto_now=True)
     group = models.ForeignKey('Group', on_delete=models.CASCADE)

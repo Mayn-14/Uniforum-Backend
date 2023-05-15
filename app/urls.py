@@ -2,5 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('<str:group_name>/', views.index)
+    path('chat/<int:id>', views.index)
 ]

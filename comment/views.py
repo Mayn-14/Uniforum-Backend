@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.backends import TokenBackend
+# from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from customUser.models import Account
 from django.db.models import F
@@ -16,6 +17,8 @@ from django.db.models import F
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def questionComment_api(request, id=None):
+    # for k, v in request.__dict__.items():
+    #         print(k, " : ", v)
 
     if request.method == 'GET':
         question = QuestionComment.objects.filter(question=id)

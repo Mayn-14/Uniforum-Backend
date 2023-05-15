@@ -6,10 +6,12 @@ from django.db.models import F
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Question
 from .serializers import questionSerializer
+import uuid 
 
 
 @api_view()
 def api_routes(request):
+    print(str(uuid.uuid1()))
     if request.method == 'GET':
         routes = {"question": "http://127.0.0.1:8000/question/"}
     return Response(routes)

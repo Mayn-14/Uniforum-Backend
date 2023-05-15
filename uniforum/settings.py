@@ -40,16 +40,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'customUser.apps.CustomuserConfig',
+    # PACKAGES
     'rest_framework_simplejwt',
     'rest_framework',
     'ckeditor',
     'corsheaders',
     'drf_spectacular',
+    # APPS
     'app',
     'question',
     'comment',
     'answer',
     'notification',
+    'chat',
+    'testing',
 ]
 
 MIDDLEWARE = [
