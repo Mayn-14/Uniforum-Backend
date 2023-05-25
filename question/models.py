@@ -25,3 +25,6 @@ class Question(models.Model):
         if not self.question_slug:
             self.question_slug = slugify(self.question)
         return super().save(*args, **kwargs)
+
+    def get_most_upvoted_answer(self):
+        return self.answers.first()

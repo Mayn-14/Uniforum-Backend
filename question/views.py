@@ -1,10 +1,12 @@
 from rest_framework import status
+from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import F
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Question
+from customUser.models import Account
 from .serializers import questionSerializer
 import uuid 
 
@@ -30,11 +32,16 @@ def question_api(request, slug=None):
             serializer = questionSerializer(question)
             return Response(serializer.data)
 
-        question = Question.objects.all()
+        question = Question.objects.exclude(answers__isnull=True)
         serializer = questionSerializer(question, many=True)
         return Response(serializer.data)
 
     if request.method == 'POST':
+        token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+        valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
+        user_id = valid_data['user_id']
+        request.data['user'] = user_id
+        print(request.data)
         serializer = questionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

@@ -17,8 +17,27 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
     upvote = models.ManyToManyField(Account, related_name="upvote_answer")
     downvote = models.ManyToManyField(Account, related_name="downvote_answer")
+
+    class Meta:
+        ordering = ["-upvote_count"]
     
 
     def __str__(self):
         return self.message
+
+    # def __iter__(self):
+    #     return [
+    #         self.message,
+    #         self.upvote_count,
+    #         self.downvote_count,
+    #         self.totalvote,
+    #         self.views,
+    #         self.isdeleted,
+    #         self.created_at,
+    #         self.updated_at,
+    #         self.user,
+    #         self.question,
+    #         self.upvote,
+    #         self.downvote,
+    #     ]
 
