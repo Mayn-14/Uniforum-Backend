@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication 
 from rest_framework_simplejwt.backends import TokenBackend
 from customUser.models import Account
+from question.models import Question
 
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
@@ -30,6 +31,9 @@ def answer_api(request, id=None):
     #     return Response(serializer.data)
 
     if request.method == 'POST':
+        question = Question.objects.get(id=request.data['question'])
+        question.answer_count = F('answer_count') + 1
+        question.save()
         serializer = answerSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -66,7 +70,7 @@ def answer_upvote(request, id=None):
     valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
     user_id = valid_data['user_id']
     user = Account.objects.get(id=user_id)
-    if not answer.upvote.exists():
+    if not answer.upvote.through.objects.filter(account_id=user).exists():
         answer.upvote.add(user)
         answer.upvote_count = F("upvote_count") + 1
         answer.totalvote = F("totalvote") + 1
@@ -91,7 +95,7 @@ def answer_downvote(request, id=None):
     valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
     user_id = valid_data['user_id']
     user = Account.objects.get(id=user_id)
-    if not answer.downvote.exists():
+    if not answer.downvote.through.objects.filter(account_id=user).exists():
         answer.downvote.add(user)
         answer.downvote_count = F("downvote_count") + 1
         answer.totalvote = F("totalvote") + 1

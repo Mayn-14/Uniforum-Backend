@@ -3,7 +3,7 @@ from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import F
+from django.db.models import F, Q
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Question
 from customUser.models import Account
@@ -60,22 +60,12 @@ def question_restore(request, slug=None):
         question = Question.objects.filter(question_slug=slug).update(isdeleted=False)
         return Response({'msg': 'Question Restored'})
 
-# @api_view(['PUT',])
-# def question_upvote(request, slug=None):
-#     if request.method == 'PUT':
-#         question = Question.objects.get(question_slug=slug)
-#         question.upvote = F("upvote") + 1
-#         question.totalvote = F("totalvote") + 1
-#         question.save()
-#         question.refresh_from_db()
-#         return Response({'msg': 'upvote icremented'}, status=status.HTTP_200_OK)
-    
-# @api_view(['PUT',])
-# def question_downvote(request, slug=None):
-#     if request.method == 'PUT':
-#         question = Question.objects.get(question_slug=slug)
-#         question.downvote = F("downvote") + 1
-#         question.totalvote = F("totalvote") + 1
-#         question.save()
-#         question.refresh_from_db()
-#         return Response({'msg': 'downvote incremented'}, status=status.HTTP_200_OK)
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def recommended_question(request):
+    if request.method == 'GET':
+        question = Question.objects.filter(Q(answers__upvote_count=0) | Q(answer_count=0))
+        print(question.count())
+        serializer = questionAnswerSerializer(question, many=True)
+        return Response(serializer.data)

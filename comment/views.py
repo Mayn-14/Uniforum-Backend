@@ -10,7 +10,7 @@ from rest_framework_simplejwt.backends import TokenBackend
 # from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from customUser.models import Account
-from django.db.models import F
+from django.db.models import F, Q
 
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
@@ -21,8 +21,26 @@ def questionComment_api(request, id=None):
     #         print(k, " : ", v)
 
     if request.method == 'GET':
-        question = QuestionComment.objects.filter(question=id)
-        serializer = questionCommentSerializer(question, many=True)
+        questionComments = QuestionComment.objects.filter(question=id)
+        token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+        valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
+        user_id = valid_data['user_id']
+        user = Account.objects.get(id=user_id)
+        print('.')
+        for questionComment in questionComments:
+            if not questionComment.upvote.through.objects.filter(Q(account_id=user) & Q(questioncomment_id=questionComment.id)).exists():
+                print('f')
+                questionComment.hasUpvoted = False
+            else:
+                print('t')
+                questionComment.hasUpvoted = True
+
+            if not questionComment.downvote.through.objects.filter(Q(account_id=user) & Q(questioncomment_id=questionComment.id)).exists():
+                questionComment.hasUpvoted = False
+            else:
+                questionComment.hasUpvoted = True        
+        print('.')
+        serializer = questionCommentSerializer(questionComments, many=True)
         return Response(serializer.data)
 
     if request.method == 'POST':
@@ -54,7 +72,7 @@ def questionComment_upvote(request, id=None):
     valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
     user_id = valid_data['user_id']
     user = Account.objects.get(id=user_id)
-    if not questionComment.upvote.exists():
+    if not questionComment.upvote.through.objects.filter(Q(account_id=user) & Q(questioncomment_id=id)).exists():
         questionComment.upvote.add(user)
         questionComment.upvote_count = F("upvote_count") + 1
         questionComment.totalvote = F("totalvote") + 1
@@ -79,7 +97,7 @@ def questionComment_downvote(request, id=None):
     valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
     user_id = valid_data['user_id']
     user = Account.objects.get(id=user_id)
-    if not questionComment.downvote.exists():
+    if not questionComment.downvote.through.objects.filter(Q(account_id=user) & Q(questioncomment_id=id)).exists():
         questionComment.downvote.add(user)
         questionComment.downvote_count = F("downvote_count") + 1
         questionComment.totalvote = F("totalvote") + 1
@@ -100,8 +118,26 @@ def questionComment_downvote(request, id=None):
 @permission_classes([IsAuthenticated])
 def answerComment_api(request, id=None):
     if request.method == 'GET':
-        question = AnswerComment.objects.filter(answer=id)
-        serializer = answerCommentSerializer(question, many=True)
+        answerComments = AnswerComment.objects.filter(answer=id)
+        token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+        valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
+        user_id = valid_data['user_id']
+        user = Account.objects.get(id=user_id)
+        print(user_id)
+        for answerComment in answerComments:
+            if not answerComment.upvote.through.objects.filter(Q(account_id=user) & Q(answercomment_id=answerComment.id)).exists():
+                print('f')
+                answerComment.hasUpvoted = False
+            else:
+                print('t')
+                answerComment.hasUpvoted = True
+
+            if not answerComment.downvote.through.objects.filter(Q(account_id=user) & Q(answercomment_id=answerComment.id)).exists():
+                answerComment.hasUpvoted = False
+            else:
+                answerComment.hasUpvoted = True
+
+        serializer = answerCommentSerializer(answerComments, many=True)
         return Response(serializer.data)
 
     if request.method == 'POST':
@@ -133,7 +169,7 @@ def answerComment_upvote(request, id=None):
     valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
     user_id = valid_data['user_id']
     user = Account.objects.get(id=user_id)
-    if not answerComment.upvote.exists():
+    if not answerComment.upvote.through.objects.filter(Q(account_id=user) & Q(answercomment_id=id)).exists():
         answerComment.upvote.add(user)
         answerComment.upvote_count = F("upvote_count") + 1
         answerComment.totalvote = F("totalvote") + 1
@@ -158,7 +194,7 @@ def answerComment_downvote(request, id=None):
     valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
     user_id = valid_data['user_id']
     user = Account.objects.get(id=user_id)
-    if not answerComment.downvote.exists():
+    if not answerComment.downvote.through.objects.filter(Q(account_id=user) & Q(answercomment_id=id)).exists():
         answerComment.downvote.add(user)
         answerComment.downvote_count = F("downvote_count") + 1
         answerComment.totalvote = F("totalvote") + 1

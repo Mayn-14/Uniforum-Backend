@@ -18,6 +18,8 @@ class QuestionComment(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
     upvote = models.ManyToManyField(Account, related_name="upvote_question_comment")
     downvote = models.ManyToManyField(Account, related_name="downvote_question_comment")
+    hasUpvoted = models.BooleanField(default=False, null=True)
+    hasDownvoted = models.BooleanField(default=False, null=True)
 
 
     def __str__(self):
@@ -36,7 +38,13 @@ class AnswerComment(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
     upvote = models.ManyToManyField(Account, related_name="upvote_answer_comment")
     downvote = models.ManyToManyField(Account, related_name="downvote_answer_comment")
+    hasUpvoted = models.BooleanField(default=False, null=True)
+    hasDownvoted = models.BooleanField(default=False, null=True)
 
 
     def __str__(self):
         return self.message
+    
+    # def has_upvoted(self):
+        
+    #     pass

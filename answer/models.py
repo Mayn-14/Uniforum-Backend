@@ -15,8 +15,10 @@ class Answer(models.Model):
     updated_at = models.DateTimeField(null=True)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
-    upvote = models.ManyToManyField(Account, related_name="upvote_answer")
-    downvote = models.ManyToManyField(Account, related_name="downvote_answer")
+    upvote = models.ManyToManyField(Account, related_name="upvote_answer", null=True)
+    downvote = models.ManyToManyField(Account, related_name="downvote_answer", null=True)
+    hasUpvoted = models.BooleanField(default=False, null=True)
+    hasDownvoted = models.BooleanField(default=False, null=True)
 
     class Meta:
         ordering = ["-upvote_count"]
