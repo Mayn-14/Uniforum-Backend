@@ -7,7 +7,7 @@ from django.db.models import F
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Question
 from customUser.models import Account
-from .serializers import questionSerializer
+from .serializers import questionSerializer, questionAnswerSerializer
 import uuid 
 
 
@@ -29,7 +29,7 @@ def question_api(request, slug=None):
             question.views=F("views") + 1
             question.save()
             question.refresh_from_db()
-            serializer = questionSerializer(question)
+            serializer = questionAnswerSerializer(question)
             return Response(serializer.data)
 
         question = Question.objects.exclude(answers__isnull=True)

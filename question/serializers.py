@@ -10,3 +10,12 @@ class questionSerializer(serializers.ModelSerializer):
         model = Question
         fields = ['id', 'question', 'question_slug', 'views', 'follow_count', 'answer_count', 'isdeleted', 'deleted_at', 'created_at', 'user', 'user_name', 'user_image', 'answers']
         read_only_fields = ['id',]
+
+class questionAnswerSerializer(serializers.ModelSerializer):
+    answers = answerSerializer(read_only=True, many=True)
+    user_name = serializers.CharField(source='user.name', read_only=True)
+    user_image = serializers.ImageField(source='user.picture', read_only=True)
+    class Meta:
+        model = Question
+        fields = ['id', 'question', 'question_slug', 'views', 'follow_count', 'answer_count', 'isdeleted', 'deleted_at', 'created_at', 'user', 'user_name', 'user_image', 'answers']
+        read_only_fields = ['id',]
