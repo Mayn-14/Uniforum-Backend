@@ -9,11 +9,14 @@ from .serializers import AccountSerializer
 from django.db.models import F
 
 @api_view(['GET'])
-def get_user(request):
-    token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
-    valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
-    user_id = valid_data['user_id']
-    user = Account.objects.get(id=user_id)
+def get_user(request, id=None):
+    if id is None:
+        token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
+        valid_data = TokenBackend(algorithm='HS256').decode(token,verify=False)
+        user_id = valid_data['user_id']
+        user = Account.objects.get(id=user_id)
+    else:
+        user = Account.objects.get(id=id)
     serializer = AccountSerializer(user)
     return Response(serializer.data)
 
