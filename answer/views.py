@@ -1,21 +1,15 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import F
 from .models import Answer
 from .serializers import answerSerializer
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication 
 from rest_framework_simplejwt.backends import TokenBackend
 from customUser.models import Account
 from question.models import Question
 
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answer_api(request, id=None):
     # if request.method == 'GET':
     #     if slug is not None:
@@ -54,16 +48,12 @@ def answer_api(request, id=None):
     
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answer_restore(request, id=None):
     if request.method == 'PUT':
         question = Answer.objects.filter(id=id).update(isdeleted=False)
         return Response({'msg': 'Answer Restored'})
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answer_upvote(request, id=None):
     answer = Answer.objects.get(id=id)
     token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
@@ -87,8 +77,6 @@ def answer_upvote(request, id=None):
         
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answer_downvote(request, id=None):
     answer = Answer.objects.get(id=id)
     token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]

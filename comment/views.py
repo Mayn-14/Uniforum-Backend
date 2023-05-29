@@ -4,18 +4,13 @@ from rest_framework.decorators import api_view
 from .serializers import questionCommentSerializer, answerCommentSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from rest_framework_simplejwt.backends import TokenBackend
-# from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from customUser.models import Account
 from django.db.models import F, Q
 
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def questionComment_api(request, id=None):
     # for k, v in request.__dict__.items():
     #         print(k, " : ", v)
@@ -64,8 +59,6 @@ def questionComment_api(request, id=None):
     
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def questionComment_upvote(request, id=None):
     questionComment = QuestionComment.objects.get(id=id)
     token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
@@ -89,8 +82,6 @@ def questionComment_upvote(request, id=None):
 
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def questionComment_downvote(request, id=None):
     questionComment = QuestionComment.objects.get(id=id)
     token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
@@ -114,8 +105,6 @@ def questionComment_downvote(request, id=None):
 
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answerComment_api(request, id=None):
     if request.method == 'GET':
         answerComments = AnswerComment.objects.filter(answer=id)
@@ -161,8 +150,6 @@ def answerComment_api(request, id=None):
 
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answerComment_upvote(request, id=None):
     answerComment = AnswerComment.objects.get(id=id)
     token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]
@@ -186,8 +173,6 @@ def answerComment_upvote(request, id=None):
 
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def answerComment_downvote(request, id=None):
     answerComment = AnswerComment.objects.get(id=id)
     token = request.META.get('HTTP_AUTHORIZATION', " ").split(' ')[1]

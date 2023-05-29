@@ -1,10 +1,8 @@
 from rest_framework import status
 from rest_framework_simplejwt.backends import TokenBackend
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import F, Q
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Question
 from customUser.models import Account
 from .serializers import questionSerializer, questionAnswerSerializer
@@ -20,8 +18,6 @@ def api_routes(request):
 
 
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def question_api(request, slug=None):
     if request.method == 'GET':
         if slug is not None:
@@ -53,19 +49,15 @@ def question_api(request, slug=None):
         return Response({'msg': 'Question Deleted'})
 
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def question_restore(request, slug=None):
     if request.method == 'PUT':
         question = Question.objects.filter(question_slug=slug).update(isdeleted=False)
         return Response({'msg': 'Question Restored'})
 
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
 def recommended_question(request):
     if request.method == 'GET':
-        question = Question.objects.filter(Q(answers__upvote_count=0) | Q(answer_count=0))
+        question = Question.objects.filter(Q(answers__upvote_count=0) | Q(answer_count=0)).distinct()
         print(question.count())
         serializer = questionAnswerSerializer(question, many=True)
         return Response(serializer.data)
